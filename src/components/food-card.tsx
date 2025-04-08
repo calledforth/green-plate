@@ -1,106 +1,131 @@
+"use client"
+
 import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter } from "@/components/ui/card"
-import { Flame, Leaf, Salad, CheckCircle, ShoppingCart } from "lucide-react"
+import Image from "next/image"
 import { cn } from "@/lib/utils"
 
 export type DietaryType = "vegan" | "vegetarian" | "non-veg"
 
 interface FoodCardProps {
-  image?: string
   title: string
   price: string
+  image?: string
   dietaryType: DietaryType
   co2Saved: string
 }
 
-export default function FoodCard({ image, title, price, dietaryType, co2Saved }: FoodCardProps) {
-  const [isAdded, setIsAdded] = useState(false)
+// Sample data for expanded details
+const foodDetails: Record<string, string[]> = {
+  "Buddha Bowl": ["Quinoa", "Avocado", "Chickpeas", "Kale", "Tahini dressing"],
+  "Mediterranean Quinoa": ["Quinoa", "Cucumber", "Cherry tomatoes", "Feta", "Olives"],
+  "Asian Stir-Fry": ["Tofu", "Broccoli", "Bell peppers", "Sesame", "Soy sauce"],
+  "Grilled Chicken Plate": ["Free-range chicken", "Brown rice", "Roasted vegetables", "Herb sauce"],
+  "Salmon Poke Bowl": ["Wild-caught salmon", "Sushi rice", "Seaweed", "Avocado", "Soy glaze"],
+  "Mexican Bowl": ["Black beans", "Corn", "Guacamole", "Pico de gallo", "Lime rice"],
+  // Default for any missing items
+  "default": ["Seasonal vegetables", "Plant-based protein", "Whole grains", "House dressing"]
+}
 
-  const handleAddToCart = () => {
-    setIsAdded(true)
-    setTimeout(() => {
-      setIsAdded(false)
-    }, 1500)
-  }
+export default function FoodCard({
+  title,
+  price,
+  image,
+  dietaryType,
+  co2Saved,
+}: FoodCardProps) {
+  const [expanded, setExpanded] = useState(false)
+  const [imageError, setImageError] = useState(false)
   
-  // Convert price from $ to ₹ (multiply by 75 as a rough conversion)
-  const rupeesPrice = price.replace("$", "₹");
+  const getBorderColor = () => {
+    switch (dietaryType) {
+      case "vegan":
+      case "vegetarian":
+        return "from-green-200/40 to-emerald-300/40"
+      case "non-veg":
+        return "from-orange-200/40 to-red-300/40"
+      default:
+        return "from-gray-200 to-gray-300"
+    }
+  }
+
+  const getLabelColor = () => {
+    switch (dietaryType) {
+      case "vegan":
+      case "vegetarian":
+        return "bg-green-100 text-green-800"
+      case "non-veg":
+        return "bg-orange-100 text-orange-800"
+      default:
+        return "bg-gray-100 text-gray-800"
+    }
+  }
+
+  const ingredients = foodDetails[title] || foodDetails.default
 
   return (
-    <Card className="w-full overflow-hidden rounded-xl shadow-sm transition-all hover:shadow-md relative">
-      {/* Blurred background image */}
-      {image && (
-        <div 
-          className="absolute inset-0 z-0 opacity-10 blur-md" 
-          style={{ 
-            backgroundImage: `url(${image})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center'
-          }} 
-        />
+    <div
+      className={cn(
+        "rounded-xl overflow-hidden bg-white relative transition-all duration-300",
+        "hover:shadow-md",
+        `bg-gradient-to-r p-[1px]`,
+        getBorderColor()
       )}
-      
-      <div className="relative z-10">
+      onClick={() => setExpanded(!expanded)}
+      style={{ 
+        boxShadow: `0 0 20px rgba(${dietaryType === "non-veg" ? "251, 146, 60" : "16, 185, 129"}, 0.1)` 
+      }}
+    >
+      <div className="bg-white rounded-[calc(0.75rem-1px)] h-full">
         <div className="relative">
-          {image ? (
-            <img src={image} alt={title} className="w-full h-[150px] object-cover" />
+          {image && !imageError ? (
+            <Image
+              src={image}
+              alt={title}
+              width={400}
+              height={200}
+              className="w-full h-48 object-cover"
+              onError={() => setImageError(true)}
+            />
           ) : (
-            <div className="w-full h-[150px] bg-gray-200" />
+            <div className="w-full h-48 bg-gray-50 flex items-center justify-center">
+              <span className="text-gray-400">No image available</span>
+            </div>
           )}
+          <div className={cn(
+            "absolute top-2 right-2 text-xs font-medium px-2 py-1 rounded-full",
+            getLabelColor()
+          )}>
+            {dietaryType === "vegan" ? "Vegan" : 
+             dietaryType === "vegetarian" ? "Vegetarian" : "Non-Vegetarian"}
+          </div>
         </div>
-        
-        <CardContent className="p-4">
-          <div className="flex justify-between items-start">
-            <h3 className="font-medium text-sm">{title}</h3>
-            <span className="font-medium text-sm">{rupeesPrice}</span>
+        <div className="p-4">
+          <h3 className="font-medium text-lg mb-1">{title}</h3>
+          <div className="flex justify-between items-center mb-1">
+            <span className="font-bold">{price}</span>
+            <span className="text-sm text-green-600 font-medium">{co2Saved}</span>
           </div>
-          <div className="flex items-center gap-3 mt-1">
-            <div
-              className={`flex items-center gap-1 text-xs ${
-                dietaryType === "non-veg"
-                  ? "text-orange-500"
-                  : dietaryType === "vegetarian"
-                    ? "text-green-600"
-                    : "text-green-500"
-              }`}
-            >
-              {dietaryType === "non-veg" ? (
-                <Flame className="h-3 w-3" />
-              ) : dietaryType === "vegetarian" ? (
-                <Salad className="h-3 w-3" />
-              ) : (
-                <Salad className="h-3 w-3" />
-              )}
-              <span>{dietaryType === "non-veg" ? "Non-Veg" : dietaryType === "vegetarian" ? "Vegetarian" : "Vegan"}</span>
-            </div>
-            <div className="flex items-center gap-1 text-xs text-blue-500">
-              <Leaf className="h-3 w-3" />
-              <span>{co2Saved}</span>
-            </div>
-          </div>
-        </CardContent>
-        
-        <CardFooter className="p-4 pt-0 relative h-10">
-          <Button 
+          
+          <div 
             className={cn(
-              "absolute bottom-4 right-4 rounded-full w-9 h-9 p-0 transition-all", 
-              isAdded 
-                ? "bg-green-600 hover:bg-green-700" 
-                : "bg-black hover:bg-black/90"
+              "overflow-hidden transition-all duration-300",
+              expanded ? "max-h-48 opacity-100 mt-3" : "max-h-0 opacity-0"
             )}
-            size="sm"
-            onClick={handleAddToCart}
           >
-            {isAdded ? (
-              <CheckCircle className="h-4 w-4" />
-            ) : (
-              <ShoppingCart className="h-4 w-4" />
-            )}
-            <span className="sr-only">Add to Cart</span>
-          </Button>
-        </CardFooter>
+            <div className="pt-3 border-t">
+              <p className="text-sm font-medium text-gray-700 mb-2">Ingredients:</p>
+              <ul className="text-sm text-gray-600">
+                {ingredients.map((item, index) => (
+                  <li key={index} className="flex items-center gap-1 mb-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-gray-400"></span>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
       </div>
-    </Card>
+    </div>
   )
 }
