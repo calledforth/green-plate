@@ -1,132 +1,278 @@
 "use client"
 
-import Header from "@/components/header"
-import { useState } from "react"
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
-import { Leaf, Menu, BarChart2, User } from "lucide-react"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
+import { useCart } from "@/context/CartContext"
+import { useMemo, useState } from "react"
+import { Area, AreaChart, Line, LineChart, ResponsiveContainer, XAxis, YAxis } from "recharts"
+import { ChevronRight } from "lucide-react"
 
-export default function Dashboard() {
-  // Sample data - in a real app, this would come from your database
-  const environmentalData = [
-    { name: 'Jan', co2Saved: 34, waterSaved: 1200, landSaved: 21 },
-    { name: 'Feb', co2Saved: 42, waterSaved: 1800, landSaved: 28 },
-    { name: 'Mar', co2Saved: 45, waterSaved: 2000, landSaved: 32 },
-    { name: 'Apr', co2Saved: 53, waterSaved: 2400, landSaved: 39 },
-    { name: 'May', co2Saved: 49, waterSaved: 2100, landSaved: 35 },
-    { name: 'Jun', co2Saved: 60, waterSaved: 2700, landSaved: 45 },
-  ]
+import { cn } from "@/lib/utils"
+
+const Dashboard = () => {
+  const { cart } = useCart()
+  const [timeFilter, setTimeFilter] = useState("month") // month, year, custom
+
+  // Calculate metrics from cart data
+  const totalMeals = cart.reduce((acc, item) => acc + item.quantity, 0)
+  const totalCO2 = cart.reduce((acc, item) => acc + item.quantity * 2, 0)
+  const veganMeals = cart.filter((item) => item.isVegan).reduce((acc, item) => acc + item.quantity, 0)
+  const veganPercent = totalMeals ? Math.round((veganMeals / totalMeals) * 100) : 0
+
+  // Create data for the area chart - dynamically from cart items
+  const areaChartData = useMemo(() => {
+    // Sort by CO2 impact (highest first) to create the stacked area effect
+    return [...cart]
+      .sort((a, b) => b.quantity * 2 - a.quantity * 2)
+      .map((item, index) => ({
+        name: item.name,
+        value: item.quantity * 2, // CO2 impact
+        color: getColorForIndex(index),
+      }))
+  }, [cart])
+
+  // Create data for the monthly line chart
+  const monthlyData = useMemo(() => {
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct"]
+    // Generate some random but consistent data for the line chart
+    return months.map((month) => ({
+      month,
+      co2: Math.floor(Math.random() * 200) + 100,
+    }))
+  }, [])
+
+  // Create recommendations based on cart data
+  const recommendations = useMemo(() => {
+    const baseRecommendations = [
+      {
+        number: "01",
+        title: "Choose plant-based",
+        description: "meals more often to reduce your carbon footprint",
+      },
+      {
+        number: "02",
+        title: "Reduce food waste",
+        description: "by planning meals and storing food properly",
+      },
+      {
+        number: "03",
+        title: "Buy local and seasonal",
+        description: "to minimize transportation emissions",
+      },
+    ]
+
+    // If user has few vegan meals, suggest more
+    if (veganPercent < 30) {
+      baseRecommendations[0] = {
+        number: "01",
+        title: "Increase plant-based",
+        description: `meals from ${veganPercent}% to at least 30% of your diet`,
+      }
+    }
+
+    return baseRecommendations
+  }, [cart, veganPercent])
+
+  // Function to get gradient colors for different food items
+  function getColorForIndex(index: number) {
+    const colors = [
+      { main: "#5D4B73", id: "colorFood1" }, // Purple
+      { main: "#D48A9D", id: "colorFood2" }, // Pink
+      { main: "#E6B89C", id: "colorFood3" }, // Orange
+      { main: "#9DCDC0", id: "colorFood4" }, // Teal
+      { main: "#77ACA2", id: "colorFood5" }, // Darker teal
+    ]
+    return colors[index % colors.length]
+  }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Header />
-      
-      {/* Duplicate Header in White */}
-      <header className="bg-white shadow-sm sticky top-0 z-10">
-        <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-          <Link href="/menu" className="flex items-center gap-2">
-            <Leaf className="h-5 w-5 text-green-600" />
-            <span className="text-xl font-semibold text-gray-800 font-sans">
-              Green Plate
-            </span>
-          </Link>
-          
-          <nav className="hidden md:flex items-center gap-5">
-            <Link 
-              href="/menu" 
-              className="text-xs font-medium text-gray-600 hover:text-green-600 flex items-center gap-1"
-            >
-              <Menu className="w-3.5 h-3.5" />
-              <span>Menu</span>
-            </Link>
-            <Link 
-              href="/dashboard" 
-              className="text-xs font-medium text-green-600 flex items-center gap-1"
-            >
-              <BarChart2 className="w-3.5 h-3.5" />
-              <span>Dashboard</span>
-            </Link>
-          </nav>
+    <div className="min-h-screen bg-[#f5f2eb]">
+      <main className="max-w-6xl mx-auto p-8">
+        {/* Header */}
+        <div className="flex justify-between items-center mb-12">
+          <h1 className="text-4xl font-serif font-medium text-[#333]">Your footprint</h1>
 
-          <Link href="/login">
-            <Button 
-              variant="outline" 
-              size="sm"
-              className="text-xs px-3 flex items-center gap-1.5 border-gray-200 text-gray-700 hover:text-green-600 hover:border-green-200 bg-white/70"
+          <div className="flex gap-2">
+            <button
+              className={cn(
+                "px-4 py-2 text-sm border border-[#e5e1d8] rounded",
+                timeFilter === "year" ? "bg-[#e9e5dc]" : "bg-white",
+              )}
+              onClick={() => setTimeFilter("year")}
             >
-              <User className="h-3.5 w-3.5" />
-              Sign In
-            </Button>
-          </Link>
-        </div>
-      </header>
-      
-      <div className="container mx-auto px-6 py-8">
-        <h1 className="text-3xl font-bold text-green-800 mb-8">Environmental Impact Dashboard</h1>
-        
-        {/* Impact Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-          <div className="bg-white rounded-xl p-6 shadow-sm">
-            <h3 className="text-lg font-medium text-gray-500 mb-2">CO₂ Emissions Saved</h3>
-            <p className="text-4xl font-bold text-green-600">283kg</p>
-            <p className="text-sm text-gray-500 mt-2">Equivalent to planting 14 trees</p>
-          </div>
-          
-          <div className="bg-white rounded-xl p-6 shadow-sm">
-            <h3 className="text-lg font-medium text-gray-500 mb-2">Water Preserved</h3>
-            <p className="text-4xl font-bold text-green-600">12,200L</p>
-            <p className="text-sm text-gray-500 mt-2">Equal to 203 showers</p>
-          </div>
-          
-          <div className="bg-white rounded-xl p-6 shadow-sm">
-            <h3 className="text-lg font-medium text-gray-500 mb-2">Land Conserved</h3>
-            <p className="text-4xl font-bold text-green-600">200m²</p>
-            <p className="text-sm text-gray-500 mt-2">Size of a tennis court</p>
+              Last Year
+            </button>
+            <button
+              className={cn(
+                "px-4 py-2 text-sm border border-[#e5e1d8] rounded",
+                timeFilter === "custom" ? "bg-[#e9e5dc]" : "bg-white",
+              )}
+              onClick={() => setTimeFilter("custom")}
+            >
+              Custom range data
+            </button>
+            <button
+              className={cn(
+                "px-4 py-2 text-sm border border-[#e5e1d8] rounded",
+                timeFilter === "month" ? "bg-[#e9e5dc]" : "bg-white",
+              )}
+              onClick={() => setTimeFilter("month")}
+            >
+              Last month
+            </button>
           </div>
         </div>
-        
-        {/* Charts Section */}
-        <div className="bg-white rounded-xl p-6 shadow-sm mb-8">
-          <h2 className="text-xl font-bold mb-6">Your Environmental Impact Over Time</h2>
-          <div className="h-80">
+
+        {/* Area Chart */}
+        <div className="mb-12 relative">
+          <div className="absolute top-0 left-0 z-10">
+            <div className="mb-1">Summary</div>
+            <div className="text-6xl font-serif font-medium">{totalCO2}</div>
+            <div className="text-sm text-[#777]">kg CO₂ eq</div>
+            <div className="text-sm text-[#777]">Total amount of emissions</div>
+          </div>
+
+          <div className="h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart
-                data={environmentalData}
-                margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="co2Saved" name="CO₂ Saved (kg)" fill="#059669" />
-                <Bar dataKey="waterSaved" name="Water Saved (L)" fill="#0ea5e9" />
-                <Bar dataKey="landSaved" name="Land Saved (m²)" fill="#8b5cf6" />
-              </BarChart>
+              <AreaChart data={areaChartData} margin={{ top: 20, right: 30, left: 0, bottom: 0 }} stackOffset="expand">
+                <defs>
+                  {areaChartData.map((item, index) => {
+                    const color = getColorForIndex(index)
+                    return (
+                      <linearGradient key={color.id} id={color.id} x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor={color.main} stopOpacity={0.8} />
+                        <stop offset="95%" stopColor={color.main} stopOpacity={0.2} />
+                      </linearGradient>
+                    )
+                  })}
+                </defs>
+                {areaChartData.map((entry, index) => {
+                  const color = getColorForIndex(index)
+                  return (
+                    <Area
+                      key={`area-${index}`}
+                      type="monotone"
+                      dataKey="value"
+                      name={entry.name}
+                      stackId="1"
+                      stroke={color.main}
+                      fill={`url(#${color.id})`}
+                      fillOpacity={1}
+                    />
+                  )
+                })}
+              </AreaChart>
             </ResponsiveContainer>
           </div>
+
+          <div className="flex justify-end gap-8 text-sm">
+            {areaChartData.map((item, index) => (
+              <div key={`legend-${index}`} className="flex flex-col items-center">
+                <div>{item.name}</div>
+                <div className="font-medium">{item.value}</div>
+              </div>
+            ))}
+          </div>
         </div>
-        
-        {/* Dietary Breakdown */}
-        <div className="bg-white rounded-xl p-6 shadow-sm">
-          <h2 className="text-xl font-bold mb-6">Your Dietary Choices</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
-            <div className="p-4 rounded-lg bg-green-50">
-              <div className="text-3xl font-bold text-green-600 mb-2">68%</div>
-              <div className="text-sm text-gray-600">Plant-Based Meals</div>
+
+        {/* Two Column Layout */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {/* Line Chart */}
+          <div className="bg-white p-6 rounded border border-[#e5e1d8]">
+            <div className="flex items-center gap-2 mb-4">
+              <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" strokeWidth="1.5" fill="none">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+              </svg>
+              <div>
+                <h3 className="text-xl font-serif">How much of carbon footprint</h3>
+                <p className="text-sm text-[#777]">you are producing in last month</p>
+              </div>
             </div>
-            <div className="p-4 rounded-lg bg-amber-50">
-              <div className="text-3xl font-bold text-amber-600 mb-2">22%</div>
-              <div className="text-sm text-gray-600">Vegetarian Meals</div>
+
+            <div className="h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={monthlyData}>
+                  <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 12 }} />
+                  <YAxis
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fontSize: 12 }}
+                    domain={[0, 500]}
+                    ticks={[0, 150, 300, 500]}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="co2"
+                    stroke="#D48A9D"
+                    strokeWidth={2}
+                    dot={{ r: 4, fill: "#D48A9D" }}
+                    activeDot={{ r: 6, fill: "#D48A9D" }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
             </div>
-            <div className="p-4 rounded-lg bg-orange-50">
-              <div className="text-3xl font-bold text-orange-600 mb-2">10%</div>
-              <div className="text-sm text-gray-600">Non-Vegetarian Meals</div>
+
+            <div className="text-center mt-2">
+              <div className="text-sm font-medium">Your {totalCO2} kg CO²</div>
+              <div className="text-xs text-[#777]">Avg. {Math.round(totalCO2 * 1.2)} kg CO²</div>
+            </div>
+          </div>
+
+          {/* Recommendations */}
+          <div className="bg-white p-6 rounded border border-[#e5e1d8]">
+            <div className="flex items-center gap-2 mb-4">
+              <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" strokeWidth="1.5" fill="none">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+              </svg>
+              <div>
+                <h3 className="text-xl font-serif">Lower your emissions by {Math.round(totalCO2 * 0.2)} kg</h3>
+                <p className="text-sm text-[#777]">to respect the Paris agreement. This is how:</p>
+              </div>
+            </div>
+
+            <div className="space-y-4 mt-8">
+              {recommendations.map((rec) => (
+                <div key={rec.number} className="flex items-center border border-[#e5e1d8] rounded p-4">
+                  <div className="text-5xl font-serif text-[#e5e1d8] mr-4">{rec.number}</div>
+                  <div className="flex-1">
+                    <span className="font-medium">{rec.title}</span> {rec.description}
+                  </div>
+                  <ChevronRight className="text-[#777]" />
+                </div>
+              ))}
             </div>
           </div>
         </div>
-      </div>
+
+        {/* Food Items Detail */}
+        <div className="mt-12 bg-white p-6 rounded border border-[#e5e1d8]">
+          <h3 className="text-xl font-serif mb-6">Your Food Items</h3>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {cart.map((item, index) => {
+              const color = getColorForIndex(index)
+              return (
+                <div
+                  key={`item-${index}`}
+                  className="p-4 rounded border border-[#e5e1d8] flex items-center"
+                  style={{ borderLeftColor: color.main, borderLeftWidth: "4px" }}
+                >
+                  <div className="flex-1">
+                    <div className="font-medium">{item.name}</div>
+                    <div className="text-sm text-[#777]">
+                      {item.quantity} {item.quantity > 1 ? "items" : "item"} • {item.isVegan ? "Vegan" : "Non-vegan"}
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="font-medium">{item.quantity * 2} kg</div>
+                    <div className="text-xs text-[#777]">CO₂ eq</div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      </main>
     </div>
   )
 }
+
+export default Dashboard

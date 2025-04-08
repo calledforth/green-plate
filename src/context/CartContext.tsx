@@ -1,63 +1,76 @@
 "use client"
-import { createContext, useContext, useState, ReactNode } from "react"
 
-export type Meal = {
+import type React from "react"
+
+import { createContext, useContext, useState } from "react"
+
+// Define the cart item type
+type CartItem = {
+  id: string | number
   name: string
-  price: number
+  quantity: number
   isVegan: boolean
+  price?: number
 }
-
-type CartItem = Meal & { quantity: number }
 
 type CartContextType = {
   cart: CartItem[]
-  addToCart: (meal: Meal) => void
-  increment: (name: string) => void
-  decrement: (name: string) => void
+  setCart: (cart: CartItem[]) => void
+  addToCart: (item: CartItem) => void
+  removeFromCart: (id: string | number) => void
+  updateQuantity: (id: string | number, quantity: number) => void
 }
 
-const CartContext = createContext<CartContextType | undefined>(undefined)
+const CartContext = createContext<CartContextType>({
+  cart: [],
+  setCart: () => {},
+  addToCart: () => {},
+  removeFromCart: () => {},
+  updateQuantity: () => {},
+})
 
-export const useCart = () => {
-  const context = useContext(CartContext)
-  if (!context) throw new Error("useCart must be used within CartProvider")
-  return context
-}
+export const CartProvider = ({ children }: { children: React.ReactNode }) => {
+  const [cart, setCart] = useState<CartItem[]>([
+    // Sample data for testing
+    { id: 1, name: "Vegan Burger", quantity: 2, isVegan: true },
+    { id: 2, name: "Chicken Salad", quantity: 1, isVegan: false },
+    { id: 3, name: "Tofu Stir Fry", quantity: 3, isVegan: true },
+    { id: 4, name: "Beef Tacos", quantity: 2, isVegan: false },
+    { id: 5, name: "Vegetable Curry", quantity: 1, isVegan: true },
+  ])
 
-export const CartProvider = ({ children }: { children: ReactNode }) => {
-  const [cart, setCart] = useState<CartItem[]>([])
+  const addToCart = (item: CartItem) => {
+    const existingItem = cart.find((cartItem) => cartItem.id === item.id)
 
-  const addToCart = (meal: Meal) => {
-    setCart(prev => {
-      const exists = prev.find(item => item.name === meal.name)
-      if (exists) return prev
-      return [...prev, { ...meal, quantity: 1 }]
-    })
-  }
-
-  const increment = (name: string) => {
-    setCart(prev =>
-      prev.map(item =>
-        item.name === name ? { ...item, quantity: item.quantity + 1 } : item
+    if (existingItem) {
+      setCart(
+        cart.map((cartItem) =>
+          cartItem.id === item.id ? { ...cartItem, quantity: cartItem.quantity + item.quantity } : cartItem,
+        ),
       )
-    )
+    } else {
+      setCart([...cart, item])
+    }
   }
 
-  const decrement = (name: string) => {
-    setCart(prev =>
-      prev
-        .map(item =>
-          item.name === name
-            ? { ...item, quantity: item.quantity - 1 }
-            : item
-        )
-        .filter(item => item.quantity > 0)
-    )
+  const removeFromCart = (id: string | number) => {
+    setCart(cart.filter((item) => item.id !== id))
+  }
+
+  const updateQuantity = (id: string | number, quantity: number) => {
+    if (quantity <= 0) {
+      removeFromCart(id)
+      return
+    }
+
+    setCart(cart.map((item) => (item.id === id ? { ...item, quantity } : item)))
   }
 
   return (
-    <CartContext.Provider value={{ cart, addToCart, increment, decrement }}>
+    <CartContext.Provider value={{ cart, setCart, addToCart, removeFromCart, updateQuantity }}>
       {children}
     </CartContext.Provider>
   )
 }
+
+export const useCart = () => useContext(CartContext)
