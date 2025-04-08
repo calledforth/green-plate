@@ -3,7 +3,7 @@
 // components/Header.tsx
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
-import { Home, Menu, User, ShoppingCart, Leaf } from "lucide-react"
+import { Menu, User, BarChart2, Leaf } from "lucide-react"
 import { usePathname } from "next/navigation"
 
 export default function Header() {
@@ -26,13 +26,6 @@ export default function Header() {
         
         <nav className="hidden md:flex items-center gap-5">
           <Link 
-            href="/" 
-            className="text-xs font-medium text-gray-600 hover:text-green-600 flex items-center gap-1"
-          >
-            <Home className="w-3.5 h-3.5" />
-            <span>Home</span>
-          </Link>
-          <Link 
             href="/menu" 
             className="text-xs font-medium text-gray-600 hover:text-green-600 flex items-center gap-1"
           >
@@ -40,11 +33,11 @@ export default function Header() {
             <span>Menu</span>
           </Link>
           <Link 
-            href="/cart" 
+            href="/dashboard" 
             className="text-xs font-medium text-gray-600 hover:text-green-600 flex items-center gap-1"
           >
-            <ShoppingCart className="w-3.5 h-3.5" />
-            <span>Cart</span>
+            <BarChart2 className="w-3.5 h-3.5" />
+            <span>Dashboard</span>
           </Link>
         </nav>
 
