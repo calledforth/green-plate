@@ -34,10 +34,12 @@ export default function RootLayout({
           {children}
         </CartProvider>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#FFF5ED]`}
       >
         <Header />
-        {children}
+        <main className="min-h-screen">
+          {children}
+        </main>
       </body>
     </html>
   )
