@@ -4,6 +4,7 @@ import "./globals.css"
 import { CartProvider } from "@/context/CartContext"
 import Header from "@/components/header";
 import { ThemeProvider } from "@/context/ThemeContext";
+import { Toaster } from "sonner"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,9 +34,12 @@ export default function RootLayout({
       >
         <ThemeProvider>
           <Header />
-          <main className="min-h-screen">
-            {children}
-          </main>
+          <CartProvider>
+            <main className="min-h-screen">
+              {children}
+            </main>
+            <Toaster richColors position="bottom-center" />
+          </CartProvider>
         </ThemeProvider>
       </body>
     </html>

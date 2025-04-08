@@ -8,129 +8,149 @@ import { cn } from "@/lib/utils"
 import Link from "next/link"
 import FoodSlideshow from "@/components/food-slideshow"
 import { motion } from "framer-motion"
+import { Skeleton } from "@/components/ui/skeleton"
+import { CartButton } from "@/components/cart-button"
+import { CartDrawer } from "@/components/cart-drawer"
 
 interface MenuItem {
-  id: number
+  id: number | string
   title: string
   price: string
   image?: string
   dietaryType: DietaryType
   co2Saved: string
+  isVegan?: boolean
 }
 
-const menuItems: MenuItem[] = [
-  {
-    id: 1,
-    title: "Buddha Bowl",
-    price: "$12.99",
-    image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=2070&auto=format&fit=crop",
-    dietaryType: "vegan",
-    co2Saved: "1.0kg CO₂ saved",
-  },
-  {
-    id: 2,
-    title: "Mediterranean Quinoa",
-    price: "$10.99",
-    image: "https://images.unsplash.com/photo-1512058564366-18510be2db19?q=80&w=2072&auto=format&fit=crop",
-    dietaryType: "vegetarian",
-    co2Saved: "1.0kg CO₂ saved",
-  },
-  {
-    id: 3,
-    title: "Asian Stir-Fry",
-    price: "$11.99",
-    image: "https://images.unsplash.com/photo-1512058454905-6b841e7ad132?q=80&w=2072&auto=format&fit=crop",
-    dietaryType: "vegan",
-    co2Saved: "2.1kg CO₂ saved",
-  },
-  {
-    id: 4,
-    title: "Grilled Chicken Plate",
-    price: "$14.99",
-    image: "https://images.unsplash.com/photo-1527477396000-e27163b481c2?q=80&w=2035&auto=format&fit=crop",
-    dietaryType: "non-veg",
-    co2Saved: "1.2kg CO₂ saved",
-  },
-  {
-    id: 5,
-    title: "Salmon Poke Bowl",
-    price: "$15.99",
-    image: "https://images.unsplash.com/photo-1563822249366-3e5d6b8b0a8b?q=80&w=1974&auto=format&fit=crop",
-    dietaryType: "non-veg",
-    co2Saved: "1.3kg CO₂ saved",
-  },
-  {
-    id: 6,
-    title: "Mexican Bowl",
-    price: "$13.99",
-    image: "https://images.unsplash.com/photo-1577424983047-0d25a5733d11?q=80&w=1974&auto=format&fit=crop",
-    dietaryType: "vegan",
-    co2Saved: "3.3kg CO₂ saved",
-  },
-  // New vegetarian options
-  {
-    id: 7,
-    title: "Avocado Toast Bowl",
-    price: "$9.99",
-    image: "https://images.unsplash.com/photo-1541519227354-08fa5d50c44d?q=80&w=1972&auto=format&fit=crop",
-    dietaryType: "vegetarian",
-    co2Saved: "1.5kg CO₂ saved",
-  },
-  {
-    id: 8,
-    title: "Spinach Mushroom Risotto",
-    price: "$13.99",
-    image: "https://images.unsplash.com/photo-1476124369491-e7addf5db371?q=80&w=2070&auto=format&fit=crop",
-    dietaryType: "vegetarian",
-    co2Saved: "1.8kg CO₂ saved",
-  },
-  {
-    id: 9,
-    title: "Tofu Curry Bowl",
-    price: "$12.50",
-    image: "https://images.unsplash.com/photo-1548943487-a2e4e43b4853?q=80&w=2070&auto=format&fit=crop",
-    dietaryType: "vegan",
-    co2Saved: "2.4kg CO₂ saved",
-  },
-  // New non-vegetarian options
-  {
-    id: 10,
-    title: "Grilled Steak Plate",
-    price: "$18.99",
-    image: "https://images.unsplash.com/photo-1588168333986-5078d3ae3976?q=80&w=2070&auto=format&fit=crop",
-    dietaryType: "non-veg",
-    co2Saved: "0.8kg CO₂ saved",
-  },
-  {
-    id: 11,
-    title: "Shrimp Taco Bowl",
-    price: "$16.50",
-    image: "https://images.unsplash.com/photo-1553535994-1b71a4b89b88?q=80&w=1972&auto=format&fit=crop",
-    dietaryType: "non-veg",
-    co2Saved: "1.1kg CO₂ saved",
-  },
-  {
-    id: 12,
-    title: "Mediterranean Fish",
-    price: "$17.99",
-    image: "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?q=80&w=2070&auto=format&fit=crop",
-    dietaryType: "non-veg",
-    co2Saved: "1.0kg CO₂ saved",
-  }
+// Sample images to use with our API data
+const foodImages = [
+  "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=2070&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1512058564366-18510be2db19?q=80&w=2072&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1512058454905-6b841e7ad132?q=80&w=2072&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1527477396000-e27163b481c2?q=80&w=2035&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1563822249366-3e5d6b8b0a8b?q=80&w=1974&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1577424983047-0d25a5733d11?q=80&w=1974&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1541519227354-08fa5d50c44d?q=80&w=1972&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1476124369491-e7addf5db371?q=80&w=2070&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1548943487-a2e4e43b4853?q=80&w=2070&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1588168333986-5078d3ae3976?q=80&w=2070&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1553535994-1b71a4b89b88?q=80&w=1972&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?q=80&w=2070&auto=format&fit=crop"
 ]
 
 export default function MenuPage() {
   const [filter, setFilter] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([])
+  const [error, setError] = useState<string | null>(null)
+  const [isCartOpen, setIsCartOpen] = useState(false)
   
-  // Simulate loading effect
+  // Fetch menu items from API
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false)
-    }, 800)
-    
-    return () => clearTimeout(timer)
+    const fetchMenuItems = async () => {
+      try {
+        setIsLoading(true)
+        const response = await fetch('/api/meals')
+        
+        if (!response.ok) {
+          throw new Error(`Error: ${response.status}`)
+        }
+        
+        const data = await response.json()
+        
+        // Add random images and process MongoDB data format
+        const formattedData = data.map((item: any, index: number) => {
+          // If the API hasn't transformed the data, do it here
+          const dietaryType = item.dietaryType || determineDietaryType(item)
+          const title = item.title || item.name || "Unnamed Dish"
+          const price = item.price.startsWith ? item.price : `$${item.price}`
+          
+          return {
+            id: item.id || item._id || index,
+            title,
+            price,
+            image: foodImages[index % foodImages.length], // Cycle through our images
+            dietaryType,
+            co2Saved: item.co2Saved || `${(Math.random() * 2 + 0.5).toFixed(1)}kg CO₂ saved`,
+            isVegan: item.isVegan
+          }
+        })
+        
+        setMenuItems(formattedData)
+        setIsLoading(false)
+      } catch (err) {
+        console.error("Failed to fetch menu items:", err)
+        setError("Failed to load menu items. Using fallback data.")
+        
+        // Use fallback data similar to what we had before
+        setMenuItems([
+          {
+            id: 1,
+            title: "Buddha Bowl",
+            price: "$12.99",
+            image: foodImages[0],
+            dietaryType: "vegan",
+            co2Saved: "1.0kg CO₂ saved",
+          },
+          {
+            id: 2,
+            title: "Mediterranean Quinoa",
+            price: "$10.99",
+            image: foodImages[1],
+            dietaryType: "vegetarian",
+            co2Saved: "1.0kg CO₂ saved",
+          },
+          {
+            id: 3,
+            title: "Asian Stir-Fry",
+            price: "$11.99",
+            image: foodImages[2],
+            dietaryType: "vegan",
+            co2Saved: "2.1kg CO₂ saved",
+          },
+          // Use a few more items from our fallback data
+          {
+            id: 4,
+            title: "Grilled Chicken Plate",
+            price: "$14.99",
+            image: foodImages[3],
+            dietaryType: "non-veg",
+            co2Saved: "1.2kg CO₂ saved",
+          },
+          {
+            id: 5,
+            title: "Salmon Poke Bowl",
+            price: "$15.99",
+            image: foodImages[4],
+            dietaryType: "non-veg",
+            co2Saved: "1.3kg CO₂ saved",
+          },
+          {
+            id: 6,
+            title: "Mexican Bowl",
+            price: "$13.99",
+            image: foodImages[5],
+            dietaryType: "vegan",
+            co2Saved: "3.3kg CO₂ saved",
+          }
+        ])
+        setIsLoading(false)
+      }
+    }
+
+    fetchMenuItems()
   }, [])
+
+  // Helper function to determine dietary type based on MongoDB data
+  function determineDietaryType(item: any): DietaryType {
+    if (item.isVegan === true) {
+      return "vegan"
+    } else if (item.isVegetarian === true) {
+      return "vegetarian"
+    } else {
+      return "non-veg"
+    }
+  }
 
   const filteredItems = menuItems.filter(item => {
     // Apply dietary filter
@@ -248,7 +268,26 @@ export default function MenuPage() {
 
       {/* Menu Grid with Smooth Loading Effect */}
       <div className="max-w-5xl mx-auto px-6 py-12 bg-[#FFF5ED] dark:bg-black">
-        {filteredItems.length === 0 && !isLoading ? (
+        {error && (
+          <div className="bg-amber-50 border border-amber-200 text-amber-800 py-2 px-4 rounded-md mb-6 dark:bg-amber-900/20 dark:border-amber-800/30 dark:text-amber-300">
+            {error}
+          </div>
+        )}
+        
+        {isLoading ? (
+          // Loading Skeleton UI
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {Array.from({ length: 6 }).map((_, index) => (
+              <div key={index} className="rounded-xl overflow-hidden bg-white dark:bg-zinc-900 shadow-sm border border-gray-100 dark:border-zinc-800 h-full flex flex-col">
+                <Skeleton className="h-48 w-full" />
+                <div className="p-4">
+                  <Skeleton className="h-5 w-3/4 mb-2" />
+                  <Skeleton className="h-4 w-1/2" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : filteredItems.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-gray-500 dark:text-gray-400">No meals found matching your criteria.</p>
             <Button 
@@ -265,14 +304,15 @@ export default function MenuPage() {
               <motion.div
                 key={item.id}
                 initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: isLoading ? 0 : 1, y: isLoading ? 20 : 0 }}
+                animate={{ opacity: 1, y: 0 }}
                 transition={{ 
                   duration: 0.4, 
-                  delay: isLoading ? 0 : Math.min(index * 0.1, 0.8),
+                  delay: Math.min(index * 0.1, 0.8),
                   ease: "easeOut"
                 }}
               >
                 <FoodCard
+                  id={item.id}
                   title={item.title}
                   price={item.price}
                   image={item.image}
@@ -311,6 +351,10 @@ export default function MenuPage() {
           </div>
         </motion.div>
       </div>
+
+      {/* Cart Button and Drawer */}
+      <CartButton onClick={() => setIsCartOpen(true)} />
+      <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
     </div>
   )
 }
