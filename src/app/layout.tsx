@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google"
 import "./globals.css"
 import { CartProvider } from "@/context/CartContext"
 import Header from "@/components/header";
+import { ThemeProvider } from "@/context/ThemeContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,7 +16,6 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-
   title: "Green Plate - Sustainable Food Choices",
   description: "Discover delicious, eco-friendly meals that help reduce your carbon footprint",
 };
@@ -26,14 +26,17 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#FFF5ED]`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased 
+        bg-[#FFF5ED] dark:bg-black text-gray-900 dark:text-gray-100 transition-colors duration-200`}
       >
-        <Header />
-        <main className="min-h-screen">
-          {children}
-        </main>
+        <ThemeProvider>
+          <Header />
+          <main className="min-h-screen">
+            {children}
+          </main>
+        </ThemeProvider>
       </body>
     </html>
   )

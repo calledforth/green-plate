@@ -2,18 +2,18 @@
 
 import Image from "next/image"
 import Link from "next/link"
-import { Leaf,ChevronRight } from "lucide-react"
+import { Leaf, ChevronRight } from "lucide-react"
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-white">
+    <main className="min-h-screen bg-white dark:bg-black">
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-12 md:py-20 relative">
         <div className="max-w-xl">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white leading-tight">
             Sustainable food for a healthier planet.
           </h1>
-          <p className="text-xl text-gray-600 mt-4 mb-8">Eco-conscious meals to reduce your carbon footprint</p>
+          <p className="text-xl text-gray-600 dark:text-gray-300 mt-4 mb-8">Eco-conscious meals to reduce your carbon footprint</p>
           <Link
             href="/menu"
             className="inline-flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-full font-medium transition-colors"
@@ -32,14 +32,14 @@ export default function Home() {
               height={400}
               className="absolute right-20 top-20 rounded-2xl shadow-lg"
             />
-            <div className="absolute left-20 top-10 bg-white p-2 rounded-full shadow-md">
+            <div className="absolute left-20 top-10 bg-white dark:bg-zinc-900 p-2 rounded-full shadow-md">
               <Leaf className="w-8 h-8 text-green-500" />
             </div>
-            <div className="absolute right-10 top-10 bg-white p-2 rounded-full shadow-md">
-              <span className="text-green-600 font-semibold text-sm">-2.4kg CO₂</span>
+            <div className="absolute right-10 top-10 bg-white dark:bg-zinc-900 p-2 rounded-full shadow-md">
+              <span className="text-green-600 dark:text-green-400 font-semibold text-sm">-2.4kg CO₂</span>
             </div>
-            <div className="absolute right-40 bottom-20 bg-white p-2 rounded-full shadow-md">
-              <span className="text-green-600 font-semibold text-sm">+Protein</span>
+            <div className="absolute right-40 bottom-20 bg-white dark:bg-zinc-900 p-2 rounded-full shadow-md">
+              <span className="text-green-600 dark:text-green-400 font-semibold text-sm">+Protein</span>
             </div>
           </div>
         </div>
@@ -48,19 +48,19 @@ export default function Home() {
       {/* Recipe Grid */}
       <section className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="bg-gray-50 rounded-xl p-6 col-span-1 md:col-span-2 flex flex-col justify-between">
+          <div className="bg-gray-50 dark:bg-zinc-900 rounded-xl p-6 col-span-1 md:col-span-2 flex flex-col justify-between">
             <div>
-              <h3 className="text-gray-500 mb-2">Our Menu</h3>
-              <h2 className="text-2xl font-bold mb-4">Sustainable Choices</h2>
-              <p className="text-gray-600 mb-6">Each meal shows its environmental impact</p>
+              <h3 className="text-gray-500 dark:text-gray-400 mb-2">Our Menu</h3>
+              <h2 className="text-2xl font-bold mb-4 dark:text-white">Sustainable Choices</h2>
+              <p className="text-gray-600 dark:text-gray-300 mb-6">Each meal shows its environmental impact</p>
             </div>
-            <Link href="/menu" className="inline-flex items-center text-green-600 font-medium">
+            <Link href="/menu" className="inline-flex items-center text-green-600 dark:text-green-400 font-medium">
               See Full Menu <ChevronRight className="w-4 h-4 ml-1" />
             </Link>
           </div>
 
           {menuHighlights.map((item, index) => (
-            <div key={index} className="bg-gray-50 rounded-xl overflow-hidden shadow-sm">
+            <div key={index} className="bg-gray-50 dark:bg-zinc-900 rounded-xl overflow-hidden shadow-sm">
               <div className="h-40 relative">
                 <Image 
                   src={item.image} 
@@ -70,8 +70,8 @@ export default function Home() {
                 />
               </div>
               <div className="p-4">
-                <h3 className="font-medium text-gray-900">{item.title}</h3>
-                <p className="text-sm text-green-600 mt-1">{item.co2}</p>
+                <h3 className="font-medium text-gray-900 dark:text-white">{item.title}</h3>
+                <p className="text-sm text-green-600 dark:text-green-400 mt-1">{item.co2}</p>
               </div>
             </div>
           ))}
@@ -80,16 +80,16 @@ export default function Home() {
 
       {/* Popular Options */}
       <section className="container mx-auto px-4 py-12">
-        <h2 className="text-2xl font-bold mb-8">Why Choose Green Plate?</h2>
+        <h2 className="text-2xl font-bold mb-8 dark:text-white">Why Choose Green Plate?</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {benefits.map((benefit, index) => (
             <div key={index} className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                <benefit.icon className="w-6 h-6 text-green-600" />
+              <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
+                <benefit.icon className="w-6 h-6 text-green-600 dark:text-green-400" />
               </div>
               <div>
-                <h3 className="font-medium text-gray-900">{benefit.title}</h3>
-                <p className="text-sm text-gray-500">{benefit.description}</p>
+                <h3 className="font-medium text-gray-900 dark:text-white">{benefit.title}</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{benefit.description}</p>
               </div>
             </div>
           ))}
