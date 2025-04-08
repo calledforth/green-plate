@@ -1,11 +1,7 @@
 "use client"
-import Header from "@/components/header"
-import MenuSection from "@/components/MenuSection"
-import Dashboard from "@/components/Dashboard"
-import { useState } from "react"
-import Image from "next/image"
-import Link from "next/link"
-import { ChevronRight, Leaf } from "lucide-react"
+
+import { useEffect } from "react"
+import { useRouter } from "next/navigation"
 
 export default function Home() {
   return (

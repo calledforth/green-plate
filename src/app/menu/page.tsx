@@ -67,6 +67,56 @@ const menuItems: MenuItem[] = [
     dietaryType: "vegan",
     co2Saved: "3.3kg CO₂ saved",
   },
+  // New vegetarian options
+  {
+    id: 7,
+    title: "Avocado Toast Bowl",
+    price: "$9.99",
+    image: "https://images.unsplash.com/photo-1541519227354-08fa5d50c44d?q=80&w=1972&auto=format&fit=crop",
+    dietaryType: "vegetarian",
+    co2Saved: "1.5kg CO₂ saved",
+  },
+  {
+    id: 8,
+    title: "Spinach Mushroom Risotto",
+    price: "$13.99",
+    image: "https://images.unsplash.com/photo-1476124369491-e7addf5db371?q=80&w=2070&auto=format&fit=crop",
+    dietaryType: "vegetarian",
+    co2Saved: "1.8kg CO₂ saved",
+  },
+  {
+    id: 9,
+    title: "Tofu Curry Bowl",
+    price: "$12.50",
+    image: "https://images.unsplash.com/photo-1548943487-a2e4e43b4853?q=80&w=2070&auto=format&fit=crop",
+    dietaryType: "vegan",
+    co2Saved: "2.4kg CO₂ saved",
+  },
+  // New non-vegetarian options
+  {
+    id: 10,
+    title: "Grilled Steak Plate",
+    price: "$18.99",
+    image: "https://images.unsplash.com/photo-1588168333986-5078d3ae3976?q=80&w=2070&auto=format&fit=crop",
+    dietaryType: "non-veg",
+    co2Saved: "0.8kg CO₂ saved",
+  },
+  {
+    id: 11,
+    title: "Shrimp Taco Bowl",
+    price: "$16.50",
+    image: "https://images.unsplash.com/photo-1553535994-1b71a4b89b88?q=80&w=1972&auto=format&fit=crop",
+    dietaryType: "non-veg",
+    co2Saved: "1.1kg CO₂ saved",
+  },
+  {
+    id: 12,
+    title: "Mediterranean Fish",
+    price: "$17.99",
+    image: "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?q=80&w=2070&auto=format&fit=crop",
+    dietaryType: "non-veg",
+    co2Saved: "1.0kg CO₂ saved",
+  }
 ]
 
 export default function MenuPage() {
@@ -90,50 +140,39 @@ export default function MenuPage() {
       <div className="container mx-auto px-6 pt-8 pb-4">
         {/* Hero Section with Background Image */}
         <div className="relative rounded-3xl overflow-hidden my-6">
-          {/* Background Image with Blur */}
+          {/* Food Slideshow as Background */}
           <div className="absolute inset-0 z-0">
-            <Image 
-              src="https://images.unsplash.com/photo-1490818387583-1baba5e638af?q=80&w=2232&auto=format&fit=crop" 
-              alt="Food background" 
-              fill 
-              className="object-cover"
-              style={{ filter: 'blur(8px) brightness(0.9)' }}
-            />
-            <div className="absolute inset-0 bg-gradient-to-b from-green-900/40 to-green-50/90"></div>
+            <FoodSlideshow />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/60 to-black/40"></div>
           </div>
 
           <div className="relative z-1 py-12 px-6 md:px-10">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-              <div className="text-center md:text-left">
-                <div className="inline-flex items-center justify-center gap-2 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-white text-xs font-medium mb-4">
-                  <Leaf className="h-3.5 w-3.5" />
-                  <span>Eco-Conscious Dining</span>
-                </div>
-                <h1 className="text-4xl md:text-5xl font-bold text-white leading-tight mb-4">
-                  Our Menu
-                </h1>
-                <p className="text-green-50 text-lg max-w-md mx-auto md:mx-0 mb-6">
-                  Discover our selection of eco-conscious meals that help reduce your carbon footprint while delighting your taste buds.
-                </p>
-                <Link 
-                  href="/about"
-                  className="inline-flex items-center gap-2 bg-white/20 hover:bg-white/30 backdrop-blur-md text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm"
-                >
-                  Learn about our CO₂ calculations
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path
-                      d="M9 5l7 7-7 7"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </Link>
+            <div className="text-center">
+              <div className="inline-flex items-center justify-center gap-2 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-white text-xs font-medium mb-4">
+                <Leaf className="h-3.5 w-3.5 text-white" />
+                <span>Eco-Conscious Dining</span>
               </div>
-              <div className="hidden md:block">
-                <FoodSlideshow />
-              </div>
+              <h1 className="text-4xl md:text-5xl font-bold text-white leading-tight mb-4">
+                Our Menu
+              </h1>
+              <p className="text-white text-lg max-w-md mx-auto mb-6">
+                Discover our selection of eco-conscious meals that help reduce your carbon footprint while delighting your taste buds.
+              </p>
+              <Link 
+                href="/about"
+                className="inline-flex items-center gap-2 bg-white/20 hover:bg-white/30 backdrop-blur-md text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm"
+              >
+                Learn about our CO₂ calculations
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path
+                    d="M9 5l7 7-7 7"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </Link>
             </div>
           </div>
         </div>
