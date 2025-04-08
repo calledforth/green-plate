@@ -10,11 +10,6 @@ import { ChevronRight, Leaf } from "lucide-react"
 export default function Home() {
   return (
     <main className="min-h-screen bg-white">
-      <Header />
-      <MenuSection onOrderCountChange={setOrderCount} />
-      <Dashboard orderCount={orderCount} />
-      <footer className="text-center text-sm text-gray-500 py-6">© 2025 GreenPlate. All rights reserved.</footer>
-
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-12 md:py-20 relative">
         <div className="max-w-xl">

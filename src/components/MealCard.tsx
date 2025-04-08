@@ -1,5 +1,4 @@
 import { Meal, useCart } from "@/context/CartContext"
-import Image from "next/image"
 
 const MealCard = ({ meal }: { meal: Meal }) => {
   const { cart, addToCart, increment, decrement } = useCart()
@@ -7,14 +6,6 @@ const MealCard = ({ meal }: { meal: Meal }) => {
 
   return (
     <div className="bg-white rounded-xl shadow-md p-5 transition-transform hover:scale-105 hover:shadow-lg animate-fadeIn">
-      <div className="relative w-full h-40 mb-4 rounded-lg overflow-hidden">
-        <Image
-          src={meal.image}
-          alt={meal.name}
-          fill
-          className="object-cover"
-        />
-      </div>
       <h3 className="text-xl font-heading mb-2">{meal.name}</h3>
       <p className="text-sm text-gray-600">Price: ₹{meal.price}</p>
       <p className={`mt-1 text-sm font-semibold ${meal.isVegan ? "text-greenplate-dark" : "text-red-500"}`}>

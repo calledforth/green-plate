@@ -15,9 +15,7 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "GreenPlate",
-  description: "Sustainable meal delivery platform",
-}
+
   title: "Green Plate - Sustainable Food Choices",
   description: "Discover delicious, eco-friendly meals that help reduce your carbon footprint",
 };
@@ -29,10 +27,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <CartProvider>
-          {children}
-        </CartProvider>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#FFF5ED]`}
       >
