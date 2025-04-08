@@ -82,18 +82,6 @@ export default function MenuPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <h1 className="text-2xl font-bold">Green Plate</h1>
-          <Button 
-            variant="outline" 
-            onClick={() => console.log("Sign out clicked")}
-          >
-            Sign Out
-          </Button>
-        </div>
-      </header>
-      
       <div className="max-w-5xl mx-auto py-10 px-6">
         <div className="flex justify-center mb-10 gap-4">
           <Button
