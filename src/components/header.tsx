@@ -1,55 +1,16 @@
-"use client"
+// components/Header.tsx
+import React from "react"
 
-import { Button } from "@/components/ui/button"
-import Link from "next/link"
-import { usePathname } from "next/navigation";
-import { cn } from "@/lib/utils";
-
-export function MainNav() {
-  const pathname = usePathname();
-
+const Header = () => {
   return (
-    <nav className="flex items-center space-x-4">
-      <Link
-        href="/menu"
-        className={cn(
-          "text-sm font-medium transition-colors hover:text-primary",
-          pathname === "/menu"
-            ? "text-primary"
-            : "text-muted-foreground"
-        )}
-      >
-        Menu
-      </Link>
-      <Link
-        href="/dashboard"
-        className={cn(
-          "text-sm font-medium transition-colors hover:text-primary",
-          pathname === "/dashboard"
-            ? "text-primary"
-            : "text-muted-foreground"
-        )}
-      >
-        Dashboard
-      </Link>
-    </nav>
-  );
-}
-
-export default function Header() {
-  return (
-    <header className="border-b">
-      <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-        <Link href="/">
-          <h1 className="text-2xl font-bold">Green Plate</h1>
-        </Link>
-        <Button 
-          variant="outline" 
-          onClick={() => console.log("Sign out clicked")}
-        >
-          Sign Out
-        </Button>
-      </div>
+    <header className="w-full bg-greenplate-light/60 backdrop-blur-md shadow-sm py-4 px-8 flex items-center justify-between">
+      <div className="text-2xl font-heading text-greenplate-dark tracking-tight">🌿 GreenPlate</div>
+      <nav className="space-x-6 text-lg font-medium">
+        <button className="hover:text-greenplate-dark transition-colors">Menu</button>
+        <button className="hover:text-greenplate-dark transition-colors">Dashboard</button>
+      </nav>
     </header>
   )
 }
+
+export default Header
