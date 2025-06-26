@@ -1,335 +1,289 @@
 "use client"
 
-import { useCart } from "@/context/CartContext"
 import { useMemo } from "react"
-import { Area, AreaChart, Line, LineChart, ResponsiveContainer, XAxis, YAxis } from "recharts"
-import { ChevronRight, ShoppingCart } from "lucide-react"
+import { Area, AreaChart, Line, LineChart, ResponsiveContainer, XAxis, YAxis, Bar, BarChart, PieChart, Pie, Cell } from "recharts"
+import { TrendingUp, TrendingDown, Leaf, Flame, MapPin, Star, Calendar, Award, Users, Target } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import { Card } from "@/components/ui/card"
 
 const Dashboard = () => {
-  const { cart } = useCart()
+  // Mock data for order history and analytics
+  const orderHistory = useMemo(() => [
+    { month: "Jan", orders: 12, co2Saved: 24, calories: 18500, spending: 340 },
+    { month: "Feb", orders: 18, co2Saved: 36, calories: 21800, spending: 425 },
+    { month: "Mar", orders: 15, co2Saved: 30, calories: 19200, spending: 380 },
+    { month: "Apr", orders: 22, co2Saved: 44, calories: 26400, spending: 520 },
+    { month: "May", orders: 28, co2Saved: 56, calories: 31200, spending: 650 },
+    { month: "Jun", orders: 25, co2Saved: 50, calories: 29000, spending: 590 },
+    { month: "Jul", orders: 32, co2Saved: 64, calories: 35600, spending: 745 },
+    { month: "Aug", orders: 29, co2Saved: 58, calories: 33400, spending: 680 },
+    { month: "Sep", orders: 26, co2Saved: 52, calories: 30800, spending: 620 },
+    { month: "Oct", orders: 31, co2Saved: 62, calories: 34200, spending: 720 },
+    { month: "Nov", orders: 35, co2Saved: 70, calories: 38500, spending: 810 },
+    { month: "Dec", orders: 42, co2Saved: 84, calories: 42000, spending: 920 }
+  ], [])
 
-  // Calculate metrics from cart data using the simplified logic: number of items * 2
-  const totalMeals = cart.reduce((acc, item) => acc + item.quantity, 0)
-  const totalCO2 = cart.reduce((acc, item) => acc + item.quantity * 2, 0)
-  const veganMeals = cart.filter((item) => item.isVegan).reduce((acc, item) => acc + item.quantity, 0)
-  const veganPercent = totalMeals ? Math.round((veganMeals / totalMeals) * 100) : 0
+  const topRestaurants = [
+    { name: "Green Garden Bistro", orders: 45, percentage: 28, color: "#10B981" },
+    { name: "Fresh & Local", orders: 38, percentage: 24, color: "#F59E0B" },
+    { name: "Eco Eats", orders: 32, percentage: 20, color: "#EF4444" },
+    { name: "Plant Paradise", orders: 28, percentage: 18, color: "#8B5CF6" },
+    { name: "Others", orders: 16, percentage: 10, color: "#6B7280" }
+  ]
 
-  // Create data for the area chart - dynamically from cart items
-  const areaChartData = useMemo(() => {
-    // Sort by CO2 impact (highest first) to create the stacked area effect
-    return [...cart]
-      .sort((a, b) => b.quantity * 2 - a.quantity * 2)
-      .map((item, index) => ({
-        name: item.name,
-        value: item.quantity * 2, // CO2 impact = quantity * 2
-        color: getColorForIndex(index),
-      }))
-  }, [cart])
+  const topFoods = [
+    { name: "Quinoa Buddha Bowl", orders: 28, calories: 450, co2: 1.2 },
+    { name: "Avocado Toast", orders: 24, calories: 320, co2: 0.8 },
+    { name: "Green Smoothie", orders: 22, calories: 180, co2: 0.5 },
+    { name: "Chickpea Curry", orders: 19, calories: 380, co2: 1.0 },
+    { name: "Veggie Burger", orders: 17, calories: 420, co2: 1.5 }
+  ]
 
-  // Create data for the monthly line chart
-  const monthlyData = useMemo(() => {
-    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct"]
-    // Generate some random but consistent data for the line chart
-    return months.map((month) => ({
-      month,
-      co2: Math.floor(Math.random() * 200) + 100,
-    }))
-  }, [])
+  const dietaryData = [
+    { name: "Vegan", value: 65, color: "#10B981" },
+    { name: "Vegetarian", value: 25, color: "#F59E0B" },
+    { name: "Non-Vegetarian", value: 10, color: "#EF4444" }
+  ]
 
-  // Create recommendations based on cart data
-  const recommendations = useMemo(() => {
-    const baseRecommendations = [
-      {
-        number: "01",
-        title: "Choose plant-based",
-        description: "meals more often to reduce your carbon footprint",
-      },
-      {
-        number: "02",
-        title: "Reduce food waste",
-        description: "by planning meals and storing food properly",
-      },
-      {
-        number: "03",
-        title: "Buy local and seasonal",
-        description: "to minimize transportation emissions",
-      },
-    ]
-
-    // If user has few vegan meals, suggest more
-    if (veganPercent < 30) {
-      baseRecommendations[0] = {
-        number: "01",
-        title: "Increase plant-based",
-        description: `meals from ${veganPercent}% to at least 30% of your diet`,
-      }
-    }
-
-    return baseRecommendations
-  }, [cart, veganPercent])
-
-  // Function to get gradient colors for different food items
-  function getColorForIndex(index: number) {
-    const colors = [
-      { main: "#5D4B73", id: "colorFood1" }, // Purple
-      { main: "#D48A9D", id: "colorFood2" }, // Pink
-      { main: "#E6B89C", id: "colorFood3" }, // Orange
-      { main: "#9DCDC0", id: "colorFood4" }, // Teal
-      { main: "#77ACA2", id: "colorFood5" }, // Darker teal
-    ]
-    return colors[index % colors.length]
-  }
-
-  // Calculate the total price of all items in the cart
-  const totalPrice = cart.reduce((acc, item) => {
-    const price = typeof item.price === 'string' ? parseFloat(item.price.replace('$', '')) : item.price;
-    return acc + (price || 0) * item.quantity;
-  }, 0);
+  // Calculate totals
+  const totalOrders = orderHistory.reduce((sum, month) => sum + month.orders, 0)
+  const totalCO2Saved = orderHistory.reduce((sum, month) => sum + month.co2Saved, 0)
+  const totalCalories = orderHistory.reduce((sum, month) => sum + month.calories, 0)
+  const totalSpent = orderHistory.reduce((sum, month) => sum + month.spending, 0)
+  const avgOrderValue = totalSpent / totalOrders
 
   return (
-    <div className="min-h-screen bg-[#f5f2eb] dark:bg-background">
-      <div className="w-full h-screen flex flex-col md:flex-row">
-        {/* Left Column - Food Items List with Checkout Button */}
-        <div className="w-full md:w-1/4 xl:w-1/5 bg-white dark:bg-card border-r border-[#e5e1d8] dark:border-border flex flex-col h-screen">
-          <div className="p-6 border-b border-[#e5e1d8] dark:border-gray-800">
-            <h3 className="text-xl font-serif mb-1 dark:text-white">Your Cart</h3>
-            <p className="text-sm text-[#777] dark:text-gray-400">{totalMeals} items · {totalCO2} kg CO₂</p>
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 dark:from-zinc-950 dark:to-zinc-900">
+      <div className="p-6 lg:p-8 max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">Food Analytics Dashboard</h1>
+          <p className="text-gray-600 dark:text-gray-400">Track your sustainable eating journey and environmental impact</p>
           </div>
           
-          <div className="flex-grow overflow-y-auto">
-            {cart.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-full p-6 text-center">
-                <div className="w-16 h-16 rounded-full bg-[#f8f6f2] dark:bg-gray-800 flex items-center justify-center mb-4">
-                  <ShoppingCart className="w-8 h-8 text-[#aaa] dark:text-gray-500" />
-                </div>
-                <p className="text-[#777] dark:text-gray-400 mb-2">Your cart is empty</p>
-                <a 
-                  href="/menu" 
-                  className="text-green-600 dark:text-green-500 text-sm font-medium hover:underline"
-                >
-                  Browse menu to add items
-                </a>
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <Card className="p-6 bg-white dark:bg-zinc-900 border-0 shadow-lg">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Orders</p>
+                <p className="text-3xl font-bold text-gray-900 dark:text-white">{totalOrders}</p>
+                <p className="text-xs text-green-600 dark:text-green-400 flex items-center mt-1">
+                  <TrendingUp className="w-3 h-3 mr-1" />
+                  +12% this month
+                </p>
               </div>
-            ) : (
-              <div className="divide-y divide-[#f5f2eb] dark:divide-gray-800">
-                {cart.map((item, index) => {
-                  const itemCO2 = item.quantity * 2; // Calculate CO2 for each item
-                  const color = getColorForIndex(index)
-                  return (
-                    <div
-                      key={`item-${index}`}
-                      className="p-4 flex items-center hover:bg-[#f8f6f2] dark:hover:bg-gray-800/50 transition-colors"
-                    >
-                      <div 
-                        className="w-2 h-12 rounded-full mr-3" 
-                        style={{ backgroundColor: color.main }}
-                      ></div>
-                      <div className="flex-1">
-                        <div className="font-medium dark:text-white">{item.name}</div>
-                        <div className="text-sm text-[#777] dark:text-gray-400 flex justify-between">
-                          <span>{item.quantity} × {item.price}</span>
-                          <span className="font-medium">${(((typeof item.price === 'string' ? parseFloat(item.price.replace('$', '')) : item.price) || 0) * item.quantity).toFixed(2)}</span>
+              <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
+                <Calendar className="w-6 h-6 text-blue-600 dark:text-blue-400" />
                         </div>
                       </div>
-                      <div className="ml-4 text-right">
-                        <div className="font-medium dark:text-white">{itemCO2} kg</div>
-                        <div className="text-xs text-[#777] dark:text-gray-400">CO₂</div>
+          </Card>
+
+          <Card className="p-6 bg-white dark:bg-zinc-900 border-0 shadow-lg">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">CO₂ Saved</p>
+                <p className="text-3xl font-bold text-gray-900 dark:text-white">{totalCO2Saved}<span className="text-lg"> kg</span></p>
+                <p className="text-xs text-green-600 dark:text-green-400 flex items-center mt-1">
+                  <TrendingUp className="w-3 h-3 mr-1" />
+                  Great progress!
+                </p>
                       </div>
-                    </div>
-                  )
-                })}
+              <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
+                <Leaf className="w-6 h-6 text-green-600 dark:text-green-400" />
               </div>
-            )}
           </div>
-          
-          {/* Checkout Section */}
-          <div className="p-4 border-t border-[#e5e1d8] dark:border-gray-800 bg-[#f8f6f2] dark:bg-gray-800/30">
-            <div className="mb-3">
-              <div className="flex justify-between text-sm mb-2">
-                <span className="text-[#777] dark:text-gray-400">Subtotal:</span>
-                <span className="font-medium dark:text-white">${totalPrice.toFixed(2)}</span>
+          </Card>
+
+          <Card className="p-6 bg-white dark:bg-zinc-900 border-0 shadow-lg">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Calories Consumed</p>
+                <p className="text-3xl font-bold text-gray-900 dark:text-white">{(totalCalories / 1000).toFixed(0)}<span className="text-lg">k</span></p>
+                <p className="text-xs text-orange-600 dark:text-orange-400 flex items-center mt-1">
+                  <Target className="w-3 h-3 mr-1" />
+                  Within healthy range
+                </p>
               </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-[#777] dark:text-gray-400">Total CO₂:</span>
-                <span className="font-medium dark:text-white">{totalCO2} kg</span>
+              <div className="w-12 h-12 bg-orange-100 dark:bg-orange-900/30 rounded-full flex items-center justify-center">
+                <Flame className="w-6 h-6 text-orange-600 dark:text-orange-400" />
               </div>
             </div>
-            
-            <Button 
-              className="w-full bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white font-medium py-5 rounded-lg shadow-sm"
-              disabled={cart.length === 0}
-            >
-              Proceed to Checkout
-            </Button>
-            
-            <div className="text-center mt-2">
-              <a 
-                href="/menu" 
-                className="text-sm text-green-600 dark:text-green-500 hover:underline"
-              >
-                Add more items
-              </a>
+          </Card>
+
+          <Card className="p-6 bg-white dark:bg-zinc-900 border-0 shadow-lg">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Avg Order Value</p>
+                <p className="text-3xl font-bold text-gray-900 dark:text-white">${avgOrderValue.toFixed(0)}</p>
+                <p className="text-xs text-blue-600 dark:text-blue-400 flex items-center mt-1">
+                  <TrendingUp className="w-3 h-3 mr-1" />
+                  +5% vs last month
+                </p>
+              </div>
+              <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center">
+                <Award className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+              </div>
             </div>
-          </div>
+          </Card>
         </div>
 
-        {/* Right Column - Dashboard Content */}
-        <div className="w-full md:w-3/4 xl:w-4/5 overflow-y-auto">
-          <div className="p-8">
-            {/* Header */}
-            <div className="mb-8">
-              <h1 className="text-3xl font-serif font-medium text-[#333] dark:text-white">Your Footprint</h1>
+        {/* Charts Row */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+          {/* Order History Chart */}
+          <Card className="p-6 bg-white dark:bg-zinc-900 border-0 shadow-lg">
+            <div className="mb-6">
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Order History</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Monthly ordering patterns over the year</p>
             </div>
-
-            {/* Area Chart */}
-            <div className="mb-8 relative bg-white dark:bg-gray-900 p-6 rounded-xl border border-[#e5e1d8] dark:border-gray-800 shadow-sm">
-              <div className="mb-6">
-                <h3 className="text-xl font-serif dark:text-white">CO₂ Emissions Overview</h3>
-                <p className="text-sm text-[#777] dark:text-gray-400">Breakdown of your carbon footprint by food item</p>
-              </div>
-              
-              <div className="absolute top-6 right-6 z-10 text-right">
-                <div className="text-4xl font-serif font-medium dark:text-white">{totalCO2}</div>
-                <div className="text-sm text-[#777] dark:text-gray-400">kg CO₂ eq</div>
-                <div className="text-sm text-[#777] dark:text-gray-400">Total emissions</div>
-              </div>
-
               <div className="h-[300px]">
                 <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart 
-                    data={areaChartData} 
-                    margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
-                  >
+                <AreaChart data={orderHistory}>
                     <defs>
-                      {areaChartData.map((item, index) => {
-                        const color = getColorForIndex(index)
-                        return (
-                          <linearGradient key={color.id} id={color.id} x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor={color.main} stopOpacity={0.8} />
-                            <stop offset="95%" stopColor={color.main} stopOpacity={0.2} />
+                    <linearGradient id="colorOrders" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.8}/>
+                      <stop offset="95%" stopColor="#3B82F6" stopOpacity={0.1}/>
                           </linearGradient>
-                        )
-                      })}
                     </defs>
-                    <XAxis 
-                      axisLine={false} 
-                      tickLine={false} 
-                      tick={{ fontSize: 12 }} 
-                      className="dark:text-gray-400" 
-                      height={0}
-                    />
-                    <YAxis 
-                      axisLine={false} 
-                      tickLine={false} 
-                      tick={{ fontSize: 12 }} 
-                      className="dark:text-gray-400" 
-                      width={30}
-                    />
-                    {areaChartData.map((entry, index) => {
-                      const color = getColorForIndex(index)
-                      return (
+                  <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 12 }} className="dark:text-gray-400" />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12 }} className="dark:text-gray-400" />
                         <Area
-                          key={`area-${index}`}
                           type="monotone"
-                          dataKey="value"
-                          name={entry.name}
-                          stackId="1"
-                          stroke={color.main}
-                          fill={`url(#${color.id})`}
+                    dataKey="orders" 
+                    stroke="#3B82F6" 
+                    strokeWidth={2}
                           fillOpacity={1}
+                    fill="url(#colorOrders)" 
                         />
-                      )
-                    })}
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
+          </Card>
 
-              <div className="flex flex-wrap justify-center gap-4 mt-6 text-sm dark:text-gray-300">
-                {areaChartData.map((item, index) => {
-                  const color = getColorForIndex(index)
-                  return (
-                    <div key={`legend-${index}`} className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-full" style={{ backgroundColor: color.main }}></div>
-                      <div>{item.name}</div>
-                      <div className="font-medium">{item.value} kg</div>
-                    </div>
-                  )
-                })}
-              </div>
+          {/* Environmental Impact */}
+          <Card className="p-6 bg-white dark:bg-zinc-900 border-0 shadow-lg">
+            <div className="mb-6">
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Environmental Impact</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">CO₂ emissions saved through sustainable choices</p>
             </div>
-
-            {/* Two Column Layout for Line Chart and Recommendations */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {/* Line Chart */}
-              <div className="bg-white dark:bg-gray-900 p-6 rounded-xl border border-[#e5e1d8] dark:border-gray-800 shadow-sm">
-                <div className="flex items-center gap-2 mb-4">
-                  <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" strokeWidth="1.5" fill="none" className="dark:text-gray-400">
-                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-                  </svg>
-                  <div>
-                    <h3 className="text-xl font-serif dark:text-white">Monthly Emissions</h3>
-                    <p className="text-sm text-[#777] dark:text-gray-400">Your carbon footprint over time</p>
-                  </div>
-                </div>
-
                 <div className="h-[300px]">
                   <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={monthlyData}>
+                <LineChart data={orderHistory}>
                       <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 12 }} className="dark:text-gray-400" />
-                      <YAxis
-                        axisLine={false}
-                        tickLine={false}
-                        tick={{ fontSize: 12 }}
-                        domain={[0, 500]}
-                        ticks={[0, 150, 300, 500]}
-                        className="dark:text-gray-400"
-                      />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12 }} className="dark:text-gray-400" />
                       <Line
                         type="monotone"
-                        dataKey="co2"
-                        stroke="#D48A9D"
-                        strokeWidth={2}
-                        dot={{ r: 4, fill: "#D48A9D" }}
-                        activeDot={{ r: 6, fill: "#D48A9D" }}
+                    dataKey="co2Saved" 
+                    stroke="#10B981" 
+                    strokeWidth={3}
+                    dot={{ r: 4, fill: "#10B981" }}
+                    activeDot={{ r: 6, fill: "#10B981" }}
                       />
                     </LineChart>
                   </ResponsiveContainer>
+            </div>
+          </Card>
                 </div>
 
-                <div className="text-center mt-2">
-                  <div className="text-sm font-medium dark:text-white">Your {totalCO2} kg CO₂</div>
-                  <div className="text-xs text-[#777] dark:text-gray-400">Avg. {Math.round(totalCO2 * 1.2)} kg CO₂</div>
-                </div>
-              </div>
-
-              {/* Recommendations */}
-              <div className="bg-white dark:bg-gray-900 p-6 rounded-xl border border-[#e5e1d8] dark:border-gray-800 shadow-sm">
-                <div className="flex items-center gap-2 mb-4">
-                  <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" strokeWidth="1.5" fill="none" className="dark:text-gray-400">
-                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-                  </svg>
-                  <div>
-                    <h3 className="text-xl font-serif dark:text-white">Lower your emissions by {Math.round(totalCO2 * 0.2)} kg</h3>
-                    <p className="text-sm text-[#777] dark:text-gray-400">to respect the Paris agreement. This is how:</p>
+        {/* Bottom Row */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Top Restaurants */}
+          <Card className="p-6 bg-white dark:bg-zinc-900 border-0 shadow-lg">
+            <div className="mb-6">
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Favorite Restaurants</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Most ordered from this year</p>
+            </div>
+            <div className="space-y-4">
+              {topRestaurants.map((restaurant, index) => (
+                <div key={restaurant.name} className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 dark:bg-zinc-800 text-sm font-medium">
+                      {index + 1}
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-900 dark:text-white">{restaurant.name}</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">{restaurant.orders} orders</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-medium text-gray-900 dark:text-white">{restaurant.percentage}%</p>
+                    <div className="w-16 h-2 bg-gray-200 dark:bg-zinc-700 rounded-full mt-1">
+                      <div 
+                        className="h-full rounded-full" 
+                        style={{ 
+                          width: `${restaurant.percentage}%`, 
+                          backgroundColor: restaurant.color 
+                        }}
+                      />
+                    </div>
                   </div>
                 </div>
-
-                <div className="space-y-4 mt-8">
-                  {recommendations.map((rec) => (
-                    <div key={rec.number} className="flex items-center border border-[#e5e1d8] dark:border-gray-800 rounded-lg p-4 dark:bg-gray-800 hover:bg-[#f8f6f2] dark:hover:bg-gray-800/70 transition-colors cursor-pointer">
-                      <div className="text-5xl font-serif text-[#e5e1d8] dark:text-gray-700 mr-4">{rec.number}</div>
-                      <div className="flex-1 dark:text-gray-300">
-                        <span className="font-medium dark:text-white">{rec.title}</span> {rec.description}
-                      </div>
-                      <ChevronRight className="text-[#777] dark:text-gray-500" />
-                    </div>
-                  ))}
-                </div>
+              ))}
               </div>
+          </Card>
+
+          {/* Top Foods */}
+          <Card className="p-6 bg-white dark:bg-zinc-900 border-0 shadow-lg">
+            <div className="mb-6">
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Most Ordered Foods</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Your go-to sustainable meals</p>
             </div>
-          </div>
+            <div className="space-y-4">
+              {topFoods.map((food, index) => (
+                <div key={food.name} className="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-zinc-800">
+                  <div>
+                    <p className="font-medium text-gray-900 dark:text-white">{food.name}</p>
+                    <div className="flex gap-4 text-xs text-gray-600 dark:text-gray-400 mt-1">
+                      <span>{food.orders} orders</span>
+                      <span>{food.calories} cal</span>
+                      <span>{food.co2} kg CO₂</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-green-100 dark:bg-green-900/30 text-sm font-bold text-green-600 dark:text-green-400">
+                    {index + 1}
+                  </div>
+                </div>
+              ))}
+                      </div>
+          </Card>
+
+          {/* Dietary Breakdown */}
+          <Card className="p-6 bg-white dark:bg-zinc-900 border-0 shadow-lg">
+            <div className="mb-6">
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Dietary Choices</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Your food preference breakdown</p>
+                    </div>
+            <div className="h-[200px] mb-4">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={dietaryData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={40}
+                    outerRadius={80}
+                    paddingAngle={5}
+                    dataKey="value"
+                  >
+                    {dietaryData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="space-y-2">
+              {dietaryData.map((item) => (
+                <div key={item.name} className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }} />
+                    <span className="text-sm text-gray-600 dark:text-gray-400">{item.name}</span>
+                  </div>
+                  <span className="font-medium text-gray-900 dark:text-white">{item.value}%</span>
+                </div>
+              ))}
+            </div>
+          </Card>
         </div>
       </div>
     </div>
