@@ -173,7 +173,7 @@ export default function FoodCard({
       {/* Food Card */}
       <div onClick={openModal} className="cursor-pointer">
         <motion.div 
-          className="rounded-xl overflow-hidden bg-white dark:bg-zinc-900 shadow-sm border border-gray-100 dark:border-zinc-800 h-full flex flex-col"
+          className="rounded-xl overflow-hidden bg-white dark:bg-zinc-900 shadow-sm border border-gray-100 dark:border-zinc-800 h-full flex flex-col min-h-[320px]"
           whileHover={{ 
             boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)",
             y: -5
@@ -181,7 +181,7 @@ export default function FoodCard({
           transition={{ duration: 0.2 }}
         >
           {/* Image Container */}
-          <div className="relative h-48 overflow-hidden">
+          <div className="relative h-48 overflow-hidden flex-shrink-0">
             {image ? (
               <Image
                 src={image}
@@ -208,7 +208,7 @@ export default function FoodCard({
             )}
             
             {/* Gradient overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent backdrop-blur-[2px] opacity-60"></div>
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
             
             {/* Price tag */}
             <div className="absolute top-3 right-3 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white font-medium px-2.5 py-1 rounded-full text-sm shadow-sm">
@@ -216,15 +216,19 @@ export default function FoodCard({
             </div>
           </div>
           
-          {/* Content Container */}
-          <div className="p-4 flex flex-col flex-grow justify-between">
-            <div>
-              <h3 className="font-medium text-gray-900 dark:text-white mb-1.5">{title}</h3>
-              <div className="flex items-center gap-1.5">
-                <Badge variant="outline" className="bg-gray-50 dark:bg-zinc-800 border-gray-100 dark:border-zinc-700 px-2 py-0.5 text-xs font-normal flex items-center gap-1">
+          {/* Content Container - New Design with Full-Width Blur */}
+          <div className="relative flex-grow">
+            {/* Blur overlay */}
+            <div className="absolute inset-0 bg-white/10 dark:bg-black/20 backdrop-blur-md rounded-t-xl border-t border-white/20"></div>
+            
+            <div className="relative p-4 flex flex-col h-full z-10">
+              <h3 className="font-semibold text-base text-gray-900 dark:text-white mb-2 leading-tight">{title}</h3>
+              <div className="flex items-center gap-2 mt-auto">
+                <Badge variant="outline" className="bg-gray-50/80 dark:bg-zinc-800/80 border-gray-100 dark:border-zinc-700 px-2 py-0.5 text-xs font-normal flex items-center gap-1.5">
                   <Icon className={`${color} w-3 h-3`} />
-                  <span className="text-gray-500 dark:text-gray-300">{label}</span>
+                  <span className="text-gray-600 dark:text-gray-300">{label}</span>
                 </Badge>
+                <span className="text-xs text-green-600 dark:text-green-400 font-medium">{co2Saved}</span>
               </div>
             </div>
           </div>

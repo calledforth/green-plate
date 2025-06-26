@@ -11,35 +11,37 @@ export default function Header() {
   const pathname = usePathname()
   const { theme, toggleTheme } = useTheme()
   
-  // Hide header on login page
-  if (pathname === "/login") {
+  // Hide header on login page and landing page
+  if (pathname === "/login" || pathname === "/") {
     return null
   }
   
   return (
-    <header className="bg-transparent backdrop-blur-sm sticky top-0 z-10 dark:bg-black/80 dark:border-b dark:border-zinc-800">
+    <header className="bg-white/80 dark:bg-background/80 backdrop-blur-sm sticky top-0 z-50 border-b border-gray-200/50 dark:border-border">
       <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2">
-          <Leaf className="h-5 w-5 text-green-600 dark:text-green-500" />
-          <span className="text-xl font-semibold text-gray-800 dark:text-white font-sans">
+        <Link href="/" className="flex items-center gap-2 group">
+          <div className="bg-green-600 p-1.5 rounded-lg group-hover:bg-green-700 transition-colors">
+            <Leaf className="h-5 w-5 text-white" />
+          </div>
+          <span className="text-xl font-bold text-gray-800 dark:text-foreground font-sans">
             Green Plate
           </span>
         </Link>
         
-        <nav className="flex items-center gap-5">
-          <div className="hidden md:flex items-center gap-5">
+        <nav className="flex items-center gap-6">
+          <div className="hidden md:flex items-center gap-6">
             <Link 
               href="/menu" 
-              className="text-xs font-medium text-gray-600 hover:text-green-600 dark:text-gray-200 dark:hover:text-green-400 flex items-center gap-1"
+              className="text-sm font-medium text-gray-600 hover:text-green-600 dark:text-muted-foreground dark:hover:text-green-400 flex items-center gap-2 transition-colors"
             >
-              <Menu className="w-3.5 h-3.5" />
+              <Menu className="w-4 h-4" />
               <span>Menu</span>
             </Link>
             <Link 
               href="/dashboard" 
-              className="text-xs font-medium text-gray-600 hover:text-green-600 dark:text-gray-200 dark:hover:text-green-400 flex items-center gap-1"
+              className="text-sm font-medium text-gray-600 hover:text-green-600 dark:text-muted-foreground dark:hover:text-green-400 flex items-center gap-2 transition-colors"
             >
-              <BarChart2 className="w-3.5 h-3.5" />
+              <BarChart2 className="w-4 h-4" />
               <span>Dashboard</span>
             </Link>
           </div>
@@ -48,7 +50,7 @@ export default function Header() {
             variant="ghost"
             size="icon"
             onClick={toggleTheme}
-            className="rounded-full mr-2 text-gray-700 hover:text-gray-900 dark:text-gray-200 dark:hover:text-white"
+            className="rounded-lg text-gray-700 hover:text-gray-900 hover:bg-gray-100 dark:text-muted-foreground dark:hover:text-foreground dark:hover:bg-muted transition-colors"
           >
             {theme === "light" ? (
               <Moon className="h-5 w-5" />
@@ -62,9 +64,9 @@ export default function Header() {
             <Button 
               variant="outline" 
               size="sm"
-              className="text-xs px-3 flex items-center gap-1.5 border-gray-200 text-gray-700 hover:text-green-600 hover:border-green-200 bg-white/70 dark:bg-black/70 dark:border-zinc-800 dark:text-white dark:hover:text-green-400 dark:hover:border-green-900"
+              className="text-sm px-4 py-2 flex items-center gap-2 border-gray-200 text-gray-700 hover:text-green-600 hover:border-green-200 hover:bg-green-50 bg-white dark:bg-card dark:border-border dark:text-foreground dark:hover:text-green-400 dark:hover:border-green-600 dark:hover:bg-green-950/20 transition-colors"
             >
-              <User className="h-3.5 w-3.5" />
+              <User className="h-4 w-4" />
               Sign In
             </Button>
           </Link>

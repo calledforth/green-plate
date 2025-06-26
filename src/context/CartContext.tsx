@@ -11,6 +11,7 @@ export interface CartItem {
   dietaryType: string
   co2Impact?: number
   image?: string
+  restaurantName?: string
 }
 
 interface CartContextType {

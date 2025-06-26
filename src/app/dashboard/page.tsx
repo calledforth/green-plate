@@ -83,13 +83,16 @@ const Dashboard = () => {
   }
 
   // Calculate the total price of all items in the cart
-  const totalPrice = cart.reduce((acc, item) => acc + (item.price || 0) * item.quantity, 0);
+  const totalPrice = cart.reduce((acc, item) => {
+    const price = typeof item.price === 'string' ? parseFloat(item.price.replace('$', '')) : item.price;
+    return acc + (price || 0) * item.quantity;
+  }, 0);
 
   return (
-    <div className="min-h-screen bg-[#f5f2eb] dark:bg-gray-950">
+    <div className="min-h-screen bg-[#f5f2eb] dark:bg-background">
       <div className="w-full h-screen flex flex-col md:flex-row">
         {/* Left Column - Food Items List with Checkout Button */}
-        <div className="w-full md:w-1/4 xl:w-1/5 bg-white dark:bg-gray-900 border-r border-[#e5e1d8] dark:border-gray-800 flex flex-col h-screen">
+        <div className="w-full md:w-1/4 xl:w-1/5 bg-white dark:bg-card border-r border-[#e5e1d8] dark:border-border flex flex-col h-screen">
           <div className="p-6 border-b border-[#e5e1d8] dark:border-gray-800">
             <h3 className="text-xl font-serif mb-1 dark:text-white">Your Cart</h3>
             <p className="text-sm text-[#777] dark:text-gray-400">{totalMeals} items · {totalCO2} kg CO₂</p>
@@ -126,8 +129,8 @@ const Dashboard = () => {
                       <div className="flex-1">
                         <div className="font-medium dark:text-white">{item.name}</div>
                         <div className="text-sm text-[#777] dark:text-gray-400 flex justify-between">
-                          <span>{item.quantity} × ${item.price?.toFixed(2)}</span>
-                          <span className="font-medium">${(item.price || 0) * item.quantity}</span>
+                          <span>{item.quantity} × {item.price}</span>
+                          <span className="font-medium">${(((typeof item.price === 'string' ? parseFloat(item.price.replace('$', '')) : item.price) || 0) * item.quantity).toFixed(2)}</span>
                         </div>
                       </div>
                       <div className="ml-4 text-right">

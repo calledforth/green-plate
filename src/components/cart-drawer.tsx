@@ -28,6 +28,16 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
     return null
   }
 
+  // Group cart items by restaurant
+  const groupedCart = cart.reduce((groups, item) => {
+    const restaurantName = item.restaurantName || 'Other Items'
+    if (!groups[restaurantName]) {
+      groups[restaurantName] = []
+    }
+    groups[restaurantName].push(item)
+    return groups
+  }, {} as Record<string, typeof cart>)
+
   // Calculate total price
   const totalPrice = cart.reduce((sum, item) => {
     const price = typeof item.price === 'string' 
@@ -110,80 +120,97 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                   </Button>
                 </div>
               ) : (
-                <div className="space-y-4">
-                  {cart.map((item) => (
-                    <div 
-                      key={`cart-item-${item.id}`} // Fixed unique key prop
-                      className="flex gap-3 p-3 border border-gray-100 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-800"
-                    >
-                      {item.image && (
-                        <div className="relative w-20 h-20 rounded-md overflow-hidden flex-shrink-0">
-                          <Image
-                            src={item.image}
-                            alt={item.name}
-                            fill
-                            className="object-cover"
-                          />
-                        </div>
-                      )}
+                <div className="space-y-6">
+                  {Object.entries(groupedCart).map(([restaurantName, items]) => (
+                    <div key={restaurantName} className="space-y-3">
+                      {/* Restaurant Header */}
+                      <div className="flex items-center gap-2 pb-2 border-b border-gray-100 dark:border-zinc-800">
+                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        <h3 className="font-medium text-gray-900 dark:text-white text-sm">{restaurantName}</h3>
+                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                          ({items.length} item{items.length !== 1 ? 's' : ''})
+                        </span>
+                      </div>
                       
-                      <div className="flex-1 min-w-0">
-                        <div className="flex justify-between">
-                          <h4 className="font-medium text-gray-900 dark:text-white truncate">{item.name}</h4>
-                          <span className="text-gray-900 dark:text-white font-medium">
-                            ${typeof item.price === 'string' 
-                              ? parseFloat(item.price.replace(/[^0-9.]/g, '')).toFixed(2) 
-                              : item.price.toFixed(2)}
-                          </span>
-                        </div>
-                        
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
-                          {item.dietaryType === 'vegan' ? 'Vegan' : 
-                            item.dietaryType === 'vegetarian' ? 'Vegetarian' : 'Non-Vegetarian'}
-                        </p>
-                        
-                        <div className="flex justify-between items-center">
-                          <div className="flex items-center gap-2">
-                            <button
-                              onClick={() => {
-                                if (item.quantity > 1) {
-                                  updateQuantity(item.id, item.quantity - 1)
-                                } else {
-                                  removeFromCart(item.id)
-                                }
-                              }}
-                              className="w-6 h-6 rounded-full bg-gray-100 dark:bg-zinc-700 flex items-center justify-center text-gray-600 dark:text-gray-300"
-                            >
-                              <Minus className="w-3 h-3" />
-                            </button>
-                            <span className="font-medium text-sm dark:text-white">
-                              {item.quantity}
-                            </span>
-                            <button
-                              onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                              className="w-6 h-6 rounded-full bg-gray-100 dark:bg-zinc-700 flex items-center justify-center text-gray-600 dark:text-gray-300"
-                            >
-                              <Plus className="w-3 h-3" />
-                            </button>
-                          </div>
-                          
-                          <button
-                            onClick={() => removeFromCart(item.id)}
-                            className="text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300"
+                      {/* Restaurant Items */}
+                      <div className="space-y-3">
+                        {items.map((item) => (
+                          <div 
+                            key={`cart-item-${item.id}`}
+                            className="flex gap-3 p-3 border border-gray-100 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-800"
                           >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
+                            {item.image && (
+                              <div className="relative w-16 h-16 rounded-md overflow-hidden flex-shrink-0">
+                                <Image
+                                  src={item.image}
+                                  alt={item.name}
+                                  fill
+                                  className="object-cover"
+                                />
+                              </div>
+                            )}
+                            
+                            <div className="flex-1 min-w-0">
+                              <div className="flex justify-between">
+                                <h4 className="font-medium text-gray-900 dark:text-white truncate text-sm">{item.name}</h4>
+                                <span className="text-gray-900 dark:text-white font-medium text-sm">
+                                  ${typeof item.price === 'string' 
+                                    ? parseFloat(item.price.replace(/[^0-9.]/g, '')).toFixed(2) 
+                                    : item.price.toFixed(2)}
+                                </span>
+                              </div>
+                              
+                              <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                                {item.dietaryType === 'vegan' ? '🌱 Vegan' : 
+                                  item.dietaryType === 'vegetarian' ? '🥬 Vegetarian' : '🍗 Non-Vegetarian'}
+                              </p>
+                              
+                              <div className="flex justify-between items-center">
+                                <div className="flex items-center gap-2">
+                                  <button
+                                    onClick={() => {
+                                      if (item.quantity > 1) {
+                                        updateQuantity(item.id, item.quantity - 1)
+                                      } else {
+                                        removeFromCart(item.id)
+                                      }
+                                    }}
+                                    className="w-6 h-6 rounded-full bg-gray-100 dark:bg-zinc-700 flex items-center justify-center text-gray-600 dark:text-gray-300 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors"
+                                  >
+                                    <Minus className="w-3 h-3" />
+                                  </button>
+                                  <span className="font-medium text-sm dark:text-white min-w-[1.5rem] text-center">
+                                    {item.quantity}
+                                  </span>
+                                  <button
+                                    onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                    className="w-6 h-6 rounded-full bg-gray-100 dark:bg-zinc-700 flex items-center justify-center text-gray-600 dark:text-gray-300 hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors"
+                                  >
+                                    <Plus className="w-3 h-3" />
+                                  </button>
+                                </div>
+                                
+                                <button
+                                  onClick={() => removeFromCart(item.id)}
+                                  className="text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300 transition-colors"
+                                  title="Remove item"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
                       </div>
                     </div>
                   ))}
                   
-                  <div className="text-right">
+                  <div className="text-right pt-2 border-t border-gray-100 dark:border-zinc-800">
                     <button
                       onClick={handleClearCart}
-                      className="text-xs text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 underline"
+                      className="text-xs text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 underline transition-colors"
                     >
-                      Clear cart
+                      Clear entire cart
                     </button>
                   </div>
                 </div>

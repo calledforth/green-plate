@@ -4,11 +4,17 @@ import { useEffect, useState } from "react"
 import Image from "next/image"
 import { cn } from "@/lib/utils"
 
+// Import local assets
+import img1 from "@/app/assets/alex-munsell-auIbTAcSH6E-unsplash.jpg"
+import img2 from "@/app/assets/brooke-lark-R18ecx07b3c-unsplash.jpg"
+import img3 from "@/app/assets/joseph-gonzalez-fdlZBWIP0aM-unsplash.jpg"
+import img4 from "@/app/assets/eaters-collective-ddZYOtZUnBk-unsplash.jpg"
+
 const slideshowImages = [
-  "https://images.unsplash.com/photo-1543339308-43e59d6b73a6?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3",
-  "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3",
-  "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=2080&auto=format&fit=crop&ixlib=rb-4.0.3",
-  "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?q=80&w=1981&auto=format&fit=crop&ixlib=rb-4.0.3"
+  img1,
+  img2,
+  img3,
+  img4
 ]
 
 export default function FoodSlideshow({ interval = 5000 }: { interval?: number }) {
@@ -37,7 +43,7 @@ export default function FoodSlideshow({ interval = 5000 }: { interval?: number }
     <div className="relative w-full h-full overflow-hidden">
       {slideshowImages.map((src, index) => (
         <div
-          key={src}
+          key={index}
           className={cn(
             "absolute inset-0 w-full h-full transition-opacity duration-1000",
             index === currentImageIndex 

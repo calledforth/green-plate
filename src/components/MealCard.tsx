@@ -1,31 +1,84 @@
-import { Meal, useCart } from "@/context/CartContext"
+import { useCart, CartItem } from "@/context/CartContext"
+
+interface Meal {
+  id: string | number
+  name: string
+  price: string | number
+  isVegan: boolean
+  dietaryType: string
+}
 
 const MealCard = ({ meal }: { meal: Meal }) => {
-  const { cart, addToCart, increment, decrement } = useCart()
-  const cartItem = cart.find(item => item.name === meal.name)
+  const { cart, addToCart, updateQuantity, removeFromCart } = useCart()
+  const cartItem = cart.find(item => item.id === meal.id)
+
+  const handleAddToCart = () => {
+    const cartItem: CartItem = {
+      id: meal.id,
+      name: meal.name,
+      price: meal.price,
+      quantity: 1,
+      isVegan: meal.isVegan,
+      dietaryType: meal.dietaryType,
+    }
+    addToCart(cartItem)
+  }
+
+  const handleIncrement = () => {
+    if (cartItem) {
+      updateQuantity(meal.id, cartItem.quantity + 1)
+    }
+  }
+
+  const handleDecrement = () => {
+    if (cartItem) {
+      if (cartItem.quantity === 1) {
+        removeFromCart(meal.id)
+      } else {
+        updateQuantity(meal.id, cartItem.quantity - 1)
+      }
+    }
+  }
 
   return (
-    <div className="bg-white rounded-xl shadow-md p-5 transition-transform hover:scale-105 hover:shadow-lg animate-fadeIn">
-      <h3 className="text-xl font-heading mb-2">{meal.name}</h3>
-      <p className="text-sm text-gray-600">Price: ₹{meal.price}</p>
-      <p className={`mt-1 text-sm font-semibold ${meal.isVegan ? "text-greenplate-dark" : "text-red-500"}`}>
-        {meal.isVegan ? "Vegan 🌱" : "Non-Veg 🍗"}
-      </p>
-
-      {cartItem ? (
-        <div className="flex items-center gap-2 mt-4">
-          <button onClick={() => decrement(meal.name)} className="px-3 py-1 rounded-full bg-red-100 hover:bg-red-200">−</button>
-          <span>{cartItem.quantity}</span>
-          <button onClick={() => increment(meal.name)} className="px-3 py-1 rounded-full bg-greenplate-light hover:bg-greenplate-dark hover:text-white">+</button>
+    <div className="bg-white dark:bg-card rounded-xl shadow-md p-4 transition-transform hover:scale-105 hover:shadow-lg animate-fadeIn border dark:border-border min-h-[200px] flex flex-col">
+      <div className="flex-grow">
+        <h3 className="text-lg font-heading mb-2 text-foreground leading-tight">{meal.name}</h3>
+        <p className="text-xs text-muted-foreground mb-1">Price: {typeof meal.price === 'string' ? meal.price : `$${meal.price}`}</p>
+        <div className="flex items-center mb-2">
+          <p className={`text-xs font-semibold flex items-center gap-1 ${meal.isVegan ? "text-green-600" : "text-red-500"}`}>
+            <span>{meal.isVegan ? "🌱" : "🍗"}</span>
+            <span>{meal.isVegan ? "Vegan" : "Non-Veg"}</span>
+          </p>
         </div>
-      ) : (
-        <button
-          onClick={() => addToCart(meal)}
-          className="mt-4 px-4 py-2 bg-greenplate-dark text-white rounded-full hover:bg-green-800"
-        >
-          Add to Cart
-        </button>
-      )}
+      </div>
+
+      <div className="mt-2">
+        {cartItem ? (
+          <div className="flex items-center justify-center gap-2">
+            <button 
+              onClick={handleDecrement} 
+              className="w-8 h-8 rounded-full bg-red-100 hover:bg-red-200 dark:bg-red-900/30 dark:hover:bg-red-800/50 dark:text-white flex items-center justify-center font-semibold transition-colors"
+            >
+              −
+            </button>
+            <span className="text-foreground font-medium text-base min-w-[1.5rem] text-center">{cartItem.quantity}</span>
+            <button 
+              onClick={handleIncrement} 
+              className="w-8 h-8 rounded-full bg-green-100 hover:bg-green-200 dark:bg-green-900/30 dark:hover:bg-green-800/50 dark:text-white flex items-center justify-center font-semibold transition-colors"
+            >
+              +
+            </button>
+          </div>
+        ) : (
+          <button
+            onClick={handleAddToCart}
+            className="w-full py-2 bg-green-600 text-white rounded-full hover:bg-green-700 transition-colors font-medium text-sm"
+          >
+            Add to Cart
+          </button>
+        )}
+      </div>
     </div>
   )
 }
