@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { motion, AnimatePresence } from "framer-motion"
 import { useCart } from "@/context/CartContext"
 import { toast } from "sonner"
+import { StaticImageData } from "next/image"
 
 export type DietaryType = "vegan" | "vegetarian" | "non-veg"
 
@@ -16,7 +17,7 @@ interface FoodCardProps {
   id: string | number
   title: string
   price: string
-  image?: string
+  image?: StaticImageData
   dietaryType: DietaryType
   co2Saved: string
 }
@@ -151,7 +152,7 @@ export default function FoodCard({
       isVegan,
       dietaryType,
       co2Impact,
-      image
+      image: image?.src || undefined
     }
     
     // Add to cart

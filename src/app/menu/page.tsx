@@ -11,12 +11,14 @@ import { motion } from "framer-motion"
 import { Skeleton } from "@/components/ui/skeleton"
 import { CartButton } from "@/components/cart-button"
 import { CartDrawer } from "@/components/cart-drawer"
+import foodimage from "@/app/assets/alex-munsell-Yr4n8O_3UPc-unsplash.jpg"
+import { StaticImageData } from "next/image"
 
 interface MenuItem {
   id: number | string
   title: string
   price: string
-  image?: string
+  image?: StaticImageData
   dietaryType: DietaryType
   co2Saved: string
   isVegan?: boolean
@@ -24,18 +26,14 @@ interface MenuItem {
 
 // Sample images to use with our API data
 const foodImages = [
-  "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=2070&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1512058564366-18510be2db19?q=80&w=2072&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1512058454905-6b841e7ad132?q=80&w=2072&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1527477396000-e27163b481c2?q=80&w=2035&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1563822249366-3e5d6b8b0a8b?q=80&w=1974&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1577424983047-0d25a5733d11?q=80&w=1974&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1541519227354-08fa5d50c44d?q=80&w=1972&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1476124369491-e7addf5db371?q=80&w=2070&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1548943487-a2e4e43b4853?q=80&w=2070&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1588168333986-5078d3ae3976?q=80&w=2070&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1553535994-1b71a4b89b88?q=80&w=1972&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?q=80&w=2070&auto=format&fit=crop"
+  foodimage,
+  foodimage,
+  foodimage,
+  foodimage,
+  foodimage,
+  foodimage,
+  foodimage,
+  foodimage,
 ]
 
 export default function MenuPage() {
